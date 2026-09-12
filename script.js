@@ -3,13 +3,13 @@
 const S = {vars:[], clauses:[], selected:null};
 
 const EXAMPLES = [
-  ["Running example (Sec. 4.2)", "(-x | y) & (x | y) & (x | -y) & (-x | -y)"],
-  ["Two singleton clauses (Ex. sat-1)", "(-x | y) & (x | -y)"],
-  ["x ∧ ¬x unsatisfiable (Sec. 4)", "(x) & (-x)"],
-  ["Polarised variant (Sec. 4.1)", "(-x1 | y2) & (y1 | y2) & (y1 | -x2) & (-x1 | -x2)"],
-  ["Single ternary clause (Sec. 4.1)", "(-x | y1 | y2)"],
-  ["Logic program P (Sec. 5)", "(a) & (-b | d) & (-c | d) & (-c | -d | b)"],
-  ["Logic program Q ≡ P (Sec. 5)", "(a) & (-a | -b | d) & (-c | b)"]
+  ["Example 4.3", "(-x | y) & (x | y) & (x | -y) & (-x | -y)"],
+  ["Example 4.4", "(-x | y) & (x | -y)"],
+  ["x ∧ ¬x unsatisfiable (Sec. 1)", "(x) & (-x)"],
+  ["Polarised formula (Sec. 2)", "(-x1 | y2) & (y1 | y2) & (y1 | -x2) & (-x1 | -x2)"],
+  ["Ternary clause (Sec. 2)", "(-x | y1 | y2)"],
+  ["Example 5.1", "(a) & (-b | d) & (-c | d) & (-c | -d | b)"],
+  ["Example 5.8", "(a) & (-a | -b | d) & (-c | b)"]
 ];
 const DEFAULT_FORMULA = EXAMPLES[0][1];
 
