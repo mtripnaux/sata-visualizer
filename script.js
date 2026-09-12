@@ -1,11 +1,11 @@
 "use strict";
 
-const S = {vars:[], clauses:[]};
+const S = {vars:[], clauses:[], selected:null};
 
 const EXAMPLES = [
   ["Running example (Sec. 4.2)", "(-x | y) & (x | y) & (x | -y) & (-x | -y)"],
   ["Two singleton clauses (Ex. sat-1)", "(-x | y) & (x | -y)"],
-  ["x ∧ ¬x — unsatisfiable (Sec. 4)", "(x) & (-x)"],
+  ["x ∧ ¬x unsatisfiable (Sec. 4)", "(x) & (-x)"],
   ["Polarised variant (Sec. 4.1)", "(-x1 | y2) & (y1 | y2) & (y1 | -x2) & (-x1 | -x2)"],
   ["Single ternary clause (Sec. 4.1)", "(-x | y1 | y2)"],
   ["Logic program P (Sec. 5)", "(a) & (-b | d) & (-c | d) & (-c | -d | b)"],
@@ -111,18 +111,39 @@ function isWire(c){
   return neg===1 && pos===1;
 }
 
+function varOccurs(i){
+  return S.clauses.some(c => c.lits.some(l => l.v===i));
+}
+
+function renderEmptySVG(){
+  return `<svg class="id0" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Empty diagram">`
+    + `<rect x="8" y="8" width="16" height="16" fill="none" stroke="#000" stroke-width="0.75" stroke-dasharray="3,3"/>`
+    + `</svg>`;
+}
+
+function isEditable(){
+  for(let i=0;i<S.clauses.length;i++)
+    for(let j=i+1;j<S.clauses.length;j++)
+      if(findResolution(S.clauses[i], S.clauses[j])!==null) return true;
+  return false;
+}
+
 function renderSVG(){
   const L = layout();
+  const editable = isEditable();
   const p = [`<svg viewBox="0 0 ${L.W} ${L.H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SATA diagram">`];
 
   S.clauses.forEach((c,j) => {
     const cy = L.yC(j);
+    const sel = S.selected===j ? " sel" : "";
     if(isWire(c)){
       const vNeg = c.lits.find(l=>l.neg).v, vPos = c.lits.find(l=>!l.neg).v;
       const vyNeg = L.yV(vNeg), vyPos = L.yV(vPos);
       const d = `M ${L.xNeg+R} ${vyNeg} C ${L.xNeg+24} ${vyNeg}, ${L.xC-24} ${cy}, ${L.xC} ${cy}`
         + ` C ${L.xC+24} ${cy}, ${L.xPos-24} ${vyPos}, ${L.xPos-R} ${vyPos}`;
-      p.push(`<path class="wire" d="${d}"/>`);
+      p.push(editable
+        ? `<g class="clause" data-clause="${j}"><path class="hit" d="${d}"/><path class="wire${sel}" d="${d}"/></g>`
+        : `<path class="wire${sel}" d="${d}"/>`);
       return;
     }
     c.lits.forEach(l => {
@@ -135,6 +156,7 @@ function renderSVG(){
   });
 
   S.vars.forEach((v,i) => {
+    if(!varOccurs(i)) return;
     const y = L.yV(i), rail = L.railY(i), bg = L.bulge(i);
     const loop = `M ${L.xNeg-R} ${y} C ${L.xNeg-bg} ${y}, ${L.xNeg-bg} ${rail}, ${L.xNeg-2} ${rail}`
       + ` L ${L.xPos+2} ${rail} C ${L.xPos+bg} ${rail}, ${L.xPos+bg} ${y}, ${L.xPos+R} ${y}`;
@@ -145,7 +167,10 @@ function renderSVG(){
 
   S.clauses.forEach((c,j) => {
     if(isWire(c)) return;
-    p.push(`<circle class="wnode" cx="${L.xC}" cy="${L.yC(j)}" r="${R}"/>`);
+    const sel = S.selected===j ? " sel" : "";
+    p.push(editable
+      ? `<g class="clause" data-clause="${j}"><circle class="hit" cx="${L.xC}" cy="${L.yC(j)}" r="8"/><circle class="wnode${sel}" cx="${L.xC}" cy="${L.yC(j)}" r="${R}"/></g>`
+      : `<circle class="wnode${sel}" cx="${L.xC}" cy="${L.yC(j)}" r="${R}"/>`);
   });
 
   p.push(`</svg>`);
@@ -199,24 +224,72 @@ let codeMode = "dimacs";
 function draw(){
   document.getElementById("figure").innerHTML = S.clauses.length
     ? renderSVG()
-    : `<p class="empty">Type a formula above.</p>`;
+    : renderEmptySVG();
+  document.getElementById("diagramTitle").textContent = isEditable() ? "Diagram (click two clauses to resolve)" : "Diagram";
   document.getElementById("codeTitle").textContent = codeMode === "latex" ? "LaTeX" : "DIMACS";
   document.getElementById("code").textContent = codeMode === "latex" ? tikz() : dimacs();
 }
 
-function note(t){ document.getElementById("msg").textContent = t; }
+let toastTimer = null;
+function note(t){
+  const el = document.getElementById("toast");
+  clearTimeout(toastTimer);
+  if(!t){ el.classList.remove("show"); return; }
+  el.textContent = t;
+  el.classList.add("show");
+  toastTimer = setTimeout(() => el.classList.remove("show"), 4000);
+}
 
 const src = document.getElementById("src");
 
 function reload(){
   const r = parseInput(src.value);
   S.vars = r.vars; S.clauses = r.clauses;
+  S.selected = null;
   note(r.errors.concat(r.notes).join(" "));
   draw();
 }
 
 let t = null;
 src.addEventListener("input", () => { clearTimeout(t); t = setTimeout(reload, 180); });
+
+function findResolution(a, b){
+  for(const la of a.lits) for(const lb of b.lits)
+    if(la.v===lb.v && la.neg!==lb.neg) return la.v;
+  return null;
+}
+
+function resolveClauses(i, j){
+  const a = S.clauses[i], b = S.clauses[j];
+  S.selected = null;
+  const v = findResolution(a, b);
+  if(v===null){ note("These two clauses share no complementary variable."); draw(); return; }
+  const merged = a.lits.filter(l=>l.v!==v).concat(b.lits.filter(l=>l.v!==v));
+  const seen = new Set(), kept = [];
+  for(const l of merged){
+    const key = l.v+(l.neg?"-":"+");
+    if(seen.has(key)) continue;
+    seen.add(key); kept.push(l);
+  }
+  const tautology = kept.some(l => kept.some(m => m.v===l.v && m.neg!==l.neg));
+  const rest = S.clauses.filter((_,k) => k!==i && k!==j);
+  if(tautology) S.clauses = rest;
+  else if(kept.length===0) S.clauses = rest.concat([{lits:[]}]);
+  else S.clauses = rest.concat([{lits:kept}]);
+  note("");
+  draw();
+}
+
+document.getElementById("figure").addEventListener("click", e => {
+  const el = e.target.closest("[data-clause]");
+  if(!el) return;
+  const j = +el.dataset.clause;
+  if(S.selected===null){ S.selected = j; draw(); return; }
+  if(S.selected===j){ S.selected = null; draw(); return; }
+  resolveClauses(S.selected, j);
+});
+
+document.getElementById("resetProof").addEventListener("click", reload);
 
 document.getElementById("examples").innerHTML =
   EXAMPLES.map((e,i) => `<button data-ex="${i}">${e[0]}</button>`).join("");

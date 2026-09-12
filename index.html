@@ -4,21 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SAT Algebra Visualizer</title>
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
 <div class="page">
 
   <h1>Boolean Satisfiability Diagrammatic Algebra (SATA) Visualizer</h1>
-  <p class="sub">Tao Gu, Robin Piedeleu and Fabio Zanasi. <i>A Complete Diagrammatic Calculus for Boolean Satisfiability.</i> Electronic Notes in Theoretical Informatics and Computer Science, Volume 1 — Proceedings of MFPS XXXVIII, February 2023. <a href="https://doi.org/10.46298/entics.10481">doi:10.46298/entics.10481</a>, <a href="https://arxiv.org/abs/2211.12629">arXiv:2211.12629</a>.</p>
+  <p class="sub">Tao Gu, Robin Piedeleu and Fabio Zanasi. <i>A Complete Diagrammatic Calculus for Boolean Satisfiability.</i> Electronic Notes in Theoretical Informatics and Computer Science, Volume 1 - Proceedings of MFPS XXXVIII, February 2023. <a href="https://doi.org/10.46298/entics.10481">doi:10.46298/entics.10481</a>, <a href="https://arxiv.org/abs/2211.12629">arXiv:2211.12629</a>.</p>
 
   <h2>Formula in conjunctive normal form (DIMACS or plain text):</h2>
   <textarea id="src" spellcheck="false" aria-label="Input formula"></textarea>
   <div class="strip" id="examples"></div>
-  <div class="msg" id="msg"></div>
 
   <div class="cols">
-    <figure class="fig" id="figure"></figure>
+    <section>
+      <h2 class="head-row"><span id="diagramTitle">Diagram (click two clauses to resolve)</span> <button id="resetProof">Reset</button></h2>
+      <figure class="fig" id="figure"></figure>
+    </section>
 
     <section>
       <h2 class="head-row"><span id="codeTitle">DIMACS</span> <button id="toggleCode">Show LaTeX</button></h2>
@@ -28,6 +30,8 @@
 
 </div>
 
-<script src="script.js?v=15"></script>
+<div class="toast" id="toast"></div>
+
+<script src="script.js?v=23"></script>
 </body>
 </html>
