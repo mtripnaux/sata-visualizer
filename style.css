@@ -1,0 +1,195 @@
+:root {
+  --ink: #000;
+  --paper: #fff;
+  --rule: rgba(0, 0, 0, .18);
+  --faint: rgba(0, 0, 0, .45);
+  --serif: Georgia, "Times New Roman", Times, serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0
+}
+
+html {
+  overflow-y: scroll
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 36px 24px 72px
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: 400;
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+
+.sub {
+  margin: 0 0 26px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  max-width: 76ch
+}
+
+.sub a {
+  color: inherit
+}
+
+h2 {
+  font-size: 12px;
+  font-weight: 400;
+  font-style: italic;
+  margin: 0 0 8px;
+}
+
+h2.head-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+section {
+  margin-top: 32px
+}
+
+textarea {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 9px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+textarea:focus-visible {
+  outline: none
+}
+
+button:focus-visible {
+  outline: 1.5px solid var(--ink);
+  outline-offset: 1px
+}
+
+button {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--ink)
+}
+
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px
+}
+
+.msg {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--faint);
+  font-style: italic
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-top: 26px
+}
+
+.cols section {
+  margin-top: 0
+}
+
+figure.fig {
+  margin: 0;
+  border: 1px solid var(--rule);
+  padding: 10px;
+  overflow-x: auto
+}
+
+figure.fig svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto
+}
+
+.empty {
+  padding: 44px 0;
+  text-align: center;
+  color: var(--faint);
+  font-style: italic;
+  font-size: 13.5px
+}
+
+pre.code {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  border: 1px solid var(--rule);
+  padding: 9px;
+  margin: 8px 0 0;
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre;
+}
+
+svg .wire {
+  fill: none;
+  stroke: #000;
+  stroke-width: 0.55
+}
+
+svg .wnode {
+  fill: none;
+  stroke: #000;
+  stroke-width: 0.55
+}
+
+svg .bnode {
+  fill: #000
+}
+
+@media (max-width:760px) {
+  .page {
+    padding: 24px 14px 56px
+  }
+
+  .cols {
+    grid-template-columns: 1fr
+  }
+}
